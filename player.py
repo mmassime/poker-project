@@ -42,6 +42,7 @@ class Player:
         self.__cards = []
         self.__isPlaying = True
         self.__canRaise = True
+        self.__check = False
         
     def getIsPlaying(self) -> bool:
         return self.__isPlaying
@@ -75,3 +76,9 @@ class Player:
     
     def setCanRaise(self, canRaise):
         self.__canRaise = canRaise
+        
+    def getCheck(self):
+        return self.__check
+    
+    def setCheck(self, check):
+        self.__check = check

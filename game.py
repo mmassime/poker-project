@@ -33,25 +33,20 @@ class Game():
     def isSomeoneTurn(self):
         check = False
         for i in range(self.playerNb):
-            if self.players[i].getIsPlaying and self.playersPot[i] < self.minimumBet:
+            if self.players[i].getIsPlaying() and self.playersPot[i] < self.minimumBet:
                 check = True
         return check
     
+    def everyBodyCheck(self):
+        check = False
+        for i in range(self.playerNb):
+            if self.players[i].getCheck() == False:
+                check = True
+        return check
     def turn(self):
-        while self.isSomeoneTurn():
-            if self.currentMove.getIsPlaying and self.playersPot[int(self.currentMove.getIndex())] < self.minimumBet:
-                if self.currentMove == self.you:
-                    self.playerMove()
-                else:
-                    #bot for now can only check or call
-                    currentPlayerPot = self.playersPot[int(self.currentMove.getIndex())]
-                    if currentPlayerPot < self.minimumBet:
-                        self.currentMove.setBalance(self.currentMove.getBalance() - self.minimumBet-currentPlayerPot)
-                        print("- player " + self.currentMove.getIndex() + " : raised " + str(self.minimumBet-currentPlayerPot) + "$")
-                        currentPlayerPot = self.minimumBet
-                        
-                    else:
-                        print("- player " + self.currentMove.getIndex() + " : check")
+        while self.isSomeoneTurn() or not self.everyBodyCheck():
+            if self.currentMove.getIsPlaying():
+                self.playerMove()
             currentIndex = int(self.currentMove.getIndex())
             if currentIndex == self.playerNb - 1:
                 currentIndex = -1
@@ -64,16 +59,20 @@ class Game():
         self.turn()
           
     def playerMove(self):
-            move = int(input("your turn : 1 to check; 2 to fold; 3 to raise; 4 to check the board "))
+            move = int(input("player " + self.currentMove.getIndex() + " your turn : 1 to check; 2 to fold; 3 to raise; 4 to check the board "))
             if move == 1:
-                if(self.minimumBet == 0):
+                if(self.minimumBet == 0 or self.playersPot[int(self.currentMove.getIndex())] == self.minimumBet):
                     print("- player " + self.currentMove.getIndex() + " (you) : check")
                 else:
                     print("you cannot check!")
                     self.playerMove()
             if move == 2:
-                print("- player " + self.currentMove.getIndex() + " (you) : fold")  
-                self.currentMove.setIsPlaying(False) 
+                if self.playersPot[int(self.currentMove.getIndex())] == self.minimumBet:
+                    print("your bet is the highest")
+                    self.playerMove()
+                else:
+                    print("- player " + self.currentMove.getIndex() + " (you) : fold")  
+                    self.currentMove.setIsPlaying(False) 
             if move == 3:
                 quantity = int(input("quantity of money to raise "))
                 if quantity + self.playersPot[int(self.currentMove.getIndex())] > self.minimumBet and self.currentMove.getCanRaise():
@@ -87,10 +86,12 @@ class Game():
                     print("- player " + self.currentMove.getIndex() + " (you) : raised " + str(quantity) + "$")
                     self.playersPot[int(self.currentMove.getIndex())] += quantity
                 else:
-                    print("you have to raise more!")
+                    print("impossible to complete the raise!")
                     self.playerMove()
             if move == 4:
                 self.board()
+                self.playerMove()
+                
                 
                     
                 
