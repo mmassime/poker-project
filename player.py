@@ -43,6 +43,7 @@ class Player:
         self.__isPlaying = True
         self.__canRaise = True
         self.__check = False
+        self.__allIn = False
         
     def getIsPlaying(self) -> bool:
         return self.__isPlaying
@@ -82,3 +83,9 @@ class Player:
     
     def setCheck(self, check):
         self.__check = check
+
+    def getAllIn(self):
+        return self.__allIn
+    
+    def setAllIn(self, allIn):
+        self.__allIn = allIn
