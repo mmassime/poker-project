@@ -1,5 +1,5 @@
 from player import *
-
+from collections import Counter
 class Game():
     def __init__(self, playerNb) -> None:
         self.playerNb = playerNb
@@ -89,8 +89,7 @@ class Game():
             self.turn()
         
         self.checkWinner()
-        
-        
+                  
     def checkWinner(self):
         pass
             
@@ -166,13 +165,15 @@ class Game():
         else:
             print("impossible to complete the raise!")
             self.playerMove()            
-                                     
+                                      
 def main():
     
-    deck = Deck()
-    deck.shuffle()
-    
-    game = Game(3)
+    #game = Game(3)
+    #"♠","♥","♦","♣"
+    flop = [Card(1,"♣"), Card(10,"♥"), Card(3,"♥"), Card(4,"♥"), Card(7,"♦")]
+    hand = [Card(5,"♣"), Card(11,"♥")]
+    evaluator = HandEvaluator()
+    print(evaluator.checkBestCombination(flop, hand))
     
 if __name__ == '__main__':
     main()
