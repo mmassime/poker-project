@@ -4,6 +4,7 @@ import itertools
 import random
 
 class Card:
+    #TODO ace should be higher then king
     def __init__(self, value, suit):
         self.__value = value
         self.__suit = suit

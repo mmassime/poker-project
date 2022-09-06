@@ -60,19 +60,19 @@ class HandEvaluator:
             #if it's a couple, three of a kind or poker win the bigger rank
             if c1[0] == 1 or c1[0] == 3 or c1[0] == 7:
                 if c1[2] > c2[2]:
-                    return c1
+                    return (c1,1)
                 elif c1[2] < c2[2]:
-                    return c2
+                    return (c2, 2)
             #if it's a full or a double couple check both the ranks
             if c1[0] == 2 or c1[0] == 6:
                 if c1[2] > c2[2]:
-                    return c1
+                    return (c1,1)
                 elif c1[2] < c2[2]:
-                    return c2
+                    return (c2, 2)
                 elif c1[3] > c2[3]:
-                    return c1
+                    return (c1,1)
                 elif c1[3] < c2[3]:
-                    return c2
+                    return (c2, 2)
             #otherwise win the highest cards
             i = 4
             while c1[1][i].getValue() == c2[1][i].getValue() and i != -1:
@@ -80,13 +80,13 @@ class HandEvaluator:
             if i == -1 or c1[1][i].getValue() == c2[1][i].getValue():
                 return 0
             elif c1[1][i].getValue() > c2[1][i].getValue():
-                return c1
+                return (c1,1)
             else:
-                return c2
+                return (c2, 2)
         elif c1[0] > c2[0]:
-            return c1
+            return (c1,1)
         else:
-            return c2
+            return (c2, 2)
             
     def checkBestCombination(self, flop, hand):
         #check all the combination of 5 cards between the 7 possible and return the best
@@ -100,5 +100,5 @@ class HandEvaluator:
                 evaluation = self.evaluateCards(list(c))
                 comp = self.compareCombinations(bestHand, evaluation)
                 if comp != 0:
-                    bestHand = comp
+                    bestHand = comp[0]
         return bestHand

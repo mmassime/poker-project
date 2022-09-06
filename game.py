@@ -1,3 +1,4 @@
+from sympy import minimum
 from handEvaluator import HandEvaluator
 from player import *
 from collections import Counter
@@ -28,6 +29,7 @@ class Game():
         
     def showBoard(self):
         #show the current state of the board
+        print("======================================================")
         print("Your cards are : " + str(self.you.getCards()[0]) + str(self.you.getCards()[1]))
         s = "Flop is : "
         for card in self.flop:
@@ -35,6 +37,7 @@ class Game():
         print(s)
         print("pot is " + str(self.pot))
         print("minimum bet is " + str(self.minimumBet))
+        print("======================================================")
     
     def isSomeoneTurn(self):
         #check if there is someone who still has to play
@@ -57,7 +60,10 @@ class Game():
         #play a turn
         while self.isSomeoneTurn() and self.hasEveryBodyChecked():
             if self.currentMove.getIsPlaying():
-                self.playerMove()
+                if self.currentMove == self.you:
+                    self.playerMove()
+                else:
+                    self.botMove()
             currentIndex = int(self.currentMove.getIndex())
             if currentIndex == self.playerNb - 1:
                 currentIndex = -1
@@ -92,7 +98,39 @@ class Game():
         self.checkWinner()
                   
     def checkWinner(self):
-        pass
+        evaluator = HandEvaluator()
+        i = 0
+        while self.players[i].getIsPlaying() == False:
+            i += 1
+        winner = i
+        winnerCombination = evaluator.checkBestCombination(self.flop, self.players[i].getCards())
+        i += 1
+        
+        while i < self.playerNb:
+            if self.players[i].getIsPlaying() == True:
+                c2 = evaluator.checkBestCombination(self.flop, self.players[i].getCards())
+                evaluation = evaluator.compareCombinations(winnerCombination, c2)
+                if evaluation == 0:
+                    pass
+                elif evaluation[1] == 2:
+                    winner = i
+                    winnerCombination = evaluation[0]
+            i += 1
+        
+        for player in self.players:
+            if player.getIsPlaying():
+                s = "player " + player.getIndex() + " has : "
+                for card in player.getCards():
+                    s += str(card)
+                print(s)
+        s = "Flop is : "
+        for card in self.flop:
+            s += str(card)
+        print(s)
+        s = "the winner is player " + str(winner) + " with "
+        for card in winnerCombination[1]:
+            s += str(card)
+        print(s)
             
     def playerMove(self):
             if self.currentMove.getAllIn() == True:
@@ -113,11 +151,24 @@ class Game():
                 else:
                     print("wrong input")
                     self.playerMove()
-                
+                    
+    def botMove(self):
+        #for the moment only check and raise
+        #TODO update it with ai
+        index = self.currentMove.getIndex()
+        if self.minimumBet == self.playersPot[int(index)]:
+            print("- player " + index + " (bot) : check")
+            self.currentMove.setCheck(True)
+        elif self.minimumBet - self.playersPot[int(index)] < self.currentMove.getBalance():
+            self.finalizeRaise(self.minimumBet - self.playersPot[int(index)],False,True)
+        else:
+            self.finalizeRaise(self.minimumBet - self.playersPot[int(index)],True,True)
+                      
     def checkMove(self):
         #check
         if(self.minimumBet == 0 or self.playersPot[int(self.currentMove.getIndex())] == self.minimumBet):
             print("- player " + self.currentMove.getIndex() + " (you) : check")
+            self.currentMove.setCheck(True)
         else:
             print("you cannot check!")
             self.playerMove()
@@ -131,14 +182,20 @@ class Game():
             print("- player " + self.currentMove.getIndex() + " (you) : fold")  
             self.currentMove.setIsPlaying(False)
             
-    def finalizeRaise(self, quantity, allIn):
+    def finalizeRaise(self, quantity, allIn, cpu = False):
         if allIn:
-            print("- player " + self.currentMove.getIndex() + " (you) : is ALL IN " + str(quantity) + "$")
+            if cpu:
+                print("- player " + self.currentMove.getIndex() + " (bot) : is ALL IN " + str(quantity) + "$")
+            else:
+                print("- player " + self.currentMove.getIndex() + " (you) : is ALL IN " + str(quantity) + "$")
             #TODO set All in false
             self.currentMove.setAllIn(True)
             self.currentMove.setCheck(True)
         else:
-            print("- player " + self.currentMove.getIndex() + " (you) : raised " + str(quantity) + "$")
+            if cpu:
+                print("- player " + self.currentMove.getIndex() + " (bot) : raised " + str(quantity) + "$")
+            else:
+                print("- player " + self.currentMove.getIndex() + " (you) : raised " + str(quantity) + "$")
         self.playersPot[int(self.currentMove.getIndex())] += quantity
         if self.playersPot[int(self.currentMove.getIndex())] > self.minimumBet:
             self.minimumBet = self.playersPot[int(self.currentMove.getIndex())]
@@ -169,12 +226,7 @@ class Game():
                                       
 def main():
     
-    #game = Game(3)
-    #"♠","♥","♦","♣"
-    flop = [Card(3,"♣"), Card(3,"♥"), Card(1,"♥"), Card(1,"♥"), Card(7,"♦")]
-    hand = [Card(5,"♣"), Card(7,"♥")]
-    evaluator = HandEvaluator()
-    print(evaluator.checkBestCombination(flop, hand))
+    game = Game(3)
     
 if __name__ == '__main__':
     main()
