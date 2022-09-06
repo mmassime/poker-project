@@ -1,3 +1,4 @@
+from handEvaluator import HandEvaluator
 from player import *
 from collections import Counter
 class Game():
@@ -170,8 +171,8 @@ def main():
     
     #game = Game(3)
     #"♠","♥","♦","♣"
-    flop = [Card(1,"♣"), Card(10,"♥"), Card(3,"♥"), Card(4,"♥"), Card(7,"♦")]
-    hand = [Card(5,"♣"), Card(11,"♥")]
+    flop = [Card(3,"♣"), Card(3,"♥"), Card(1,"♥"), Card(1,"♥"), Card(7,"♦")]
+    hand = [Card(5,"♣"), Card(7,"♥")]
     evaluator = HandEvaluator()
     print(evaluator.checkBestCombination(flop, hand))
     
