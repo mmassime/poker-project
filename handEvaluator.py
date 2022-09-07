@@ -16,7 +16,7 @@ class HandEvaluator:
             values.append(card.getValue())
             suits.append(card.getSuit())
         straight = False
-        if values[4] == values[3] + 1 and values[3] == values[2] + 1 and values[2] == values[1] + 1 and (values[1] == values[0] + 1 or values[4] == values[0] + 12):
+        if values[0] == values[1] - 1 and values[1] == values[2] - 1 and values[2] == values[3] - 1 and (values[3] == values[4] - 1 or values[4] == values[0] + 12):
             straight = True 
         #check for 5 same suits
         counterSuits = Counter(suits)

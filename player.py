@@ -4,7 +4,7 @@ import itertools
 import random
 
 class Card:
-    #TODO ace should be higher then king
+
     def __init__(self, value, suit):
         self.__value = value
         self.__suit = suit
@@ -16,7 +16,7 @@ class Card:
         return self.__suit
     
     def __str__(self) -> str:
-        if self.__value == 1:
+        if self.__value == 14:
             value = "A"
         elif self.__value == 11:
             value =  "J"
@@ -32,7 +32,7 @@ class Deck:
     def __init__(self) -> None:
         self.cards = []
         for suit in ["♠","♥","♦","♣"]:
-            for value in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]:
+            for value in [14, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]:
                 self.cards.append(Card(value,suit))
     def shuffle(self) -> None:
         random.shuffle(self.cards)
@@ -82,7 +82,10 @@ class Player:
     
     def getCards(self):
         return self.__cards
-
+    
+    def setCards(self, cards):
+        self.__cards = cards
+        
     def getIndex(self):
         return self.__index
     

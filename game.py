@@ -2,6 +2,8 @@ from sympy import minimum
 from handEvaluator import HandEvaluator
 from player import *
 from collections import Counter
+import os
+
 class Game():
     def __init__(self, playerNb) -> None:
         self.playerNb = playerNb
@@ -12,19 +14,20 @@ class Game():
         self.flop = []
         for i in range(playerNb):
             self.players.append(Player(500000, str(i)))
-        self.bigBlind = self.players[0]
-        self.playersPot[0] += 10000
-        self.bigBlind.setBalance(490000)
-        self.smallBlind = self.players[1]
-        self.smallBlind.setBalance(495000)
-        self.playersPot[1] += 5000
+        self.bigBlind = 0
+        self.playersPot[self.bigBlind] += 10000
+        self.players[self.bigBlind].setBalance(490000)
+        self.smallBlind = 1
+        self.players[self.smallBlind].setBalance(495000)
+        self.playersPot[self.smallBlind] += 5000
         self.pot = 15000
         self.minimumBet = 10000
         self.you = self.players[2]
         self.currentMove = self.you
+        os.system("CLS")
         print("===================== Game Start =====================")
-        print("big blind : player " + self.bigBlind.getIndex())
-        print("small blind : player " + self.smallBlind.getIndex())
+        print("big blind : player " + str(self.bigBlind))
+        print("small blind : player " + str(self.smallBlind))
         self.play()
         
     def showBoard(self):
@@ -37,12 +40,14 @@ class Game():
         print(s)
         print("pot is " + str(self.pot))
         print("minimum bet is " + str(self.minimumBet))
+        print("your balance is " + str(self.you.getBalance()) + "$")
         print("======================================================")
     
     def isSomeoneTurn(self):
         #check if there is someone who still has to play
         check = False
         for i in range(self.playerNb):
+            #TODO big blind can't raise first round
             if self.players[i].getIsPlaying() and (self.playersPot[i] < self.minimumBet or self.minimumBet == 0):
                 check = True
         return check
@@ -60,6 +65,7 @@ class Game():
         #play a turn
         while self.isSomeoneTurn() and self.hasEveryBodyChecked():
             if self.currentMove.getIsPlaying():
+                print("test")
                 if self.currentMove == self.you:
                     self.playerMove()
                 else:
@@ -131,7 +137,43 @@ class Game():
         for card in winnerCombination[1]:
             s += str(card)
         print(s)
-            
+        self.players[winner].setBalance(self.players[winner].getBalance() + self.pot)
+        x = input("press enter to continue")
+        self.restart()
+        
+    def restart(self):
+        self.bigBlind += 1
+        if self.bigBlind == self.playerNb:
+            self.bigBlind = 0
+        self.playersPot[self.bigBlind] += 10000
+        #TODO if balance < 10000 and if player isNotPlaying
+        self.players[self.bigBlind].setBalance(self.players[self.bigBlind].getBalance() - 10000)
+        self.smallBlind += 1
+        if self.smallBlind == self.playerNb:
+            self.smallBlind = 0
+        self.playersPot[self.smallBlind] += 5000
+        self.players[self.smallBlind].setBalance(self.players[self.smallBlind].getBalance() - 5000)
+        self.pot = 15000
+        self.minimumBet = 10000
+        first = self.bigBlind + 1
+        if first == self.playerNb:
+            first = 0
+        self.currentMove = self.players[first]
+        os.system("CLS")
+        print("===================== Game Start =====================")
+        print("big blind : player " + str(self.bigBlind))
+        print("small blind : player " + str(self.smallBlind))
+        for p in self.players:
+            if p.getBalance() > 0:
+                p.setIsPlaying(True)
+            else:
+                p.setIsPlaying(False)
+            p.setCards([])
+        self.flop = []
+        self.deck = Deck()
+        self.deck.shuffle()
+        self.play()
+        
     def playerMove(self):
             if self.currentMove.getAllIn() == True:
                 print("- player " + self.currentMove.getIndex() + " (you) : is ALL IN")
